@@ -1,6 +1,5 @@
 package com.tigerwolf.encryption;
 import static java.lang.Math.*;
-import java.io.Serializable;
 import java.lang.Comparable;
 import java.lang.String;
 import java.lang.Class;
@@ -11,6 +10,7 @@ import java.lang.NullPointerException;
 import java.lang.IllegalArgumentException;
 import java.lang.NumberFormatException;
 import java.lang.ArrayIndexOutOfBoundsException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -118,15 +118,15 @@ public final class Bit implements Serializable, Comparable<Bit>
 	}
 	public static Bit AND(Bit x, Bit y)
 	{
-		return (x.booleanValue() & y.booleanValue()) ? TRUE : FALSE;
+		return AND(x.booleanValue(),y.booleanValue());
 	}
 	public static Bit AND(Bit x, boolean y)
 	{
-		return (x.booleanValue() & y) ? TRUE : FALSE;
+		return AND(x.booleanValue(),y);
 	}
 	public static Bit AND(boolean x, Bit y)
 	{
-		return (x & y.booleanValue()) ? TRUE : FALSE;
+		return AND(x,y.booleanValue());
 	}
 	public static Bit AND(boolean x, boolean y)
 	{
@@ -134,24 +134,28 @@ public final class Bit implements Serializable, Comparable<Bit>
 	}
 	public static Bit[] AND(Bit[] x, Bit[] y)
 	{
-		Bit[] output = new Bit[((x.length >= y.length) ? x.length : y.length)];
+		if(x.length<y.length)
+			SignExtension(x,y.length);
+		if(y.length<x.length)
+			SignExtension(y,x.length);
+		Bit[] output = new Bit[x.length];
 		for(int bit = 0; bit<output.length;bit++)
 		{
-			output[bit] = (bit<x.length && bit<y.length) ? AND(x[bit],y[bit]) : FALSE;
+			output[bit] = AND(x[bit],y[bit]);
 		}
 		return output;
 	}
 	public static Bit XOR(Bit x, Bit y)
 	{
-		return (x.booleanValue() ^ y.booleanValue()) ? TRUE : FALSE;
+		return XOR(x.booleanValue(),y.booleanValue());
 	}
 	public static Bit XOR(Bit x, boolean y)
 	{
-		return (x.booleanValue() ^ y) ? TRUE : FALSE;
+		return XOR(x.booleanValue(),y);
 	}
 	public static Bit XOR(boolean x, Bit y)
 	{
-		return (x ^ y.booleanValue()) ? TRUE : FALSE;
+		return XOR(x,y.booleanValue());
 	}
 	public static Bit XOR(boolean x, boolean y)
 	{
@@ -159,10 +163,14 @@ public final class Bit implements Serializable, Comparable<Bit>
 	}
 	public static Bit[] XOR (Bit[] x, Bit[] y)
 	{
-		Bit[] output = new Bit[((x.length >= y.length) ? x.length : y.length)];
+		if(x.length<y.length)
+			SignExtension(x,y.length);
+		if(y.length<x.length)
+			SignExtension(y,x.length);
+		Bit[] output = new Bit[x.length];
 		for(int bit = 0; bit<output.length;bit++)
 		{
-			output[bit] = (bit<x.length && bit<y.length) ? XOR(x[bit],y[bit]) : ((bit<x.length) ? x[bit] : y[bit]);
+			output[bit] = XOR(x[bit],y[bit]);
 		}
 		return output;
 	}
@@ -184,10 +192,14 @@ public final class Bit implements Serializable, Comparable<Bit>
 	}
 	public static Bit[] OR(Bit[] x, Bit[] y)
 	{
-		Bit[] output = new Bit[((x.length >= y.length) ? x.length : y.length)];
+		if(x.length<y.length)
+			SignExtension(x,y.length);
+		if(y.length<x.length)
+			SignExtension(y,x.length);
+		Bit[] output = new Bit[x.length];
 		for(int bit = 0; bit<output.length;bit++)
 		{
-			output[bit] = (bit<x.length && bit<y.length) ? OR(x[bit],y[bit]) : ((bit<x.length) ? x[bit] : y[bit]);
+			output[bit] = OR(x[bit],y[bit]);
 		}
 		return output;
 	}
@@ -210,94 +222,138 @@ public final class Bit implements Serializable, Comparable<Bit>
 	}
 	public static Bit NAND(Bit x, Bit y)
 	{
-		return (x.booleanValue() & y.booleanValue()) ? FALSE : TRUE;
+		return NAND(x.booleanValue(),y.booleanValue());
 	}
 	public static Bit NAND(Bit x, boolean y)
 	{
-		return (x.booleanValue() & y) ? FALSE : TRUE;
+		return NAND(x.booleanValue(),y);
 	}
 	public static Bit NAND(boolean x, Bit y)
 	{
-		return (x & y.booleanValue()) ? FALSE : TRUE;
+		return NAND(x,y.booleanValue());
 	}
 	public static Bit NAND(boolean x, boolean y)
 	{
-		return (x & y) ? FALSE : TRUE;
+		return NOT(x&y);
 	}
 	public static Bit[] NAND(Bit[] x,Bit[] y)
 	{
-		Bit[] output = new Bit[((x.length >= y.length) ? x.length : y.length)];
+		if(x.length<y.length)
+			SignExtension(x,y.length);
+		if(y.length<x.length)
+			SignExtension(y,x.length);
+		Bit[] output = new Bit[x.length];
 		for(int bit = 0; bit<output.length;bit++)
 		{
-			output[bit] = (bit<x.length && bit<y.length) ? NAND(x[bit],y[bit]) : TRUE;
+			output[bit] = NAND(x[bit],y[bit]);
 		}
 		return output;
 	}
 	public static Bit NXOR(Bit x, Bit y)
 	{
-		return (x.booleanValue() ^ y.booleanValue()) ? FALSE : TRUE;
+		return NXOR(x.booleanValue(),y.booleanValue());
 	}
 	public static Bit NXOR(Bit x, boolean y)
 	{
-		return (x.booleanValue() ^ y) ? FALSE : TRUE;
+		return NXOR(x.booleanValue(),y);
 	}
 	public static Bit NXOR(boolean x, Bit y)
 	{
-		return (x ^ y.booleanValue()) ? FALSE : TRUE;
+		return NXOR(x,y.booleanValue());
 	}
 	public static Bit NXOR(boolean x, boolean y)
 	{
-		return (x ^ y) ? FALSE : TRUE;
+		return NOT(x ^ y);
 	}
 	public static Bit[] NXOR(Bit[] x, Bit[] y)
 	{
-		Bit[] output = new Bit[((x.length >= y.length) ? x.length : y.length)];
+		if(x.length<y.length)
+			SignExtension(x,y.length);
+		if(y.length<x.length)
+			SignExtension(y,x.length);
+		Bit[] output = new Bit[x.length];
 		for(int bit = 0; bit<output.length;bit++)
 		{
-			output[bit] = (bit<x.length && bit<y.length) ? NXOR(x[bit],y[bit]) : ((bit<x.length) ? NXOR(x[bit],FALSE) : NXOR(y[bit],FALSE));
+			output[bit] = NXOR(x[bit],y[bit]);
 		}
 		return output;
 	}
 	public static Bit NOR(Bit x, Bit y)
 	{
-		return (x.booleanValue() | y.booleanValue()) ? FALSE : TRUE;
+		return NOR(x.booleanValue(),y.booleanValue());
 	}
 	public static Bit NOR(Bit x, boolean y)
 	{
-		return (x.booleanValue() | y) ? FALSE : TRUE;
+		return NOR(x.booleanValue(),y);
 	}
 	public static Bit NOR(boolean x, Bit y)
 	{
-		return (x | y.booleanValue()) ? FALSE : TRUE;
+		return NOR(x,y.booleanValue());
 	}
 	public static Bit NOR(boolean x, boolean y)
 	{
-		return (x | y) ? FALSE : TRUE;
+		return NOT(x | y);
 	}
 	public static Bit[] NOR(Bit[] x, Bit[] y)
 	{
-		Bit[] output = new Bit[((x.length >= y.length) ? x.length : y.length)];
+		if(x.length<y.length)
+			SignExtension(x,y.length);
+		if(y.length<x.length)
+			SignExtension(y,x.length);
+		Bit[] output = new Bit[x.length];
 		for(int bit = 0; bit<output.length;bit++)
 		{
-			output[bit] = (bit<x.length && bit<y.length) ? NOR(x[bit],y[bit]) : ((bit<x.length) ? NOR(x[bit],FALSE) : NOR(y[bit],FALSE));
+			output[bit] = NOR(x[bit],y[bit]);
+		}
+		return output;
+	}
+	public static void SignExtension(Bit[] bitArray,int numBits)
+	{
+		if(numBits<=bitArray.length)
+			return;
+		Bit signBit = bitArray[0];
+		Bit[] temp=new Bit[numBits];
+		int increment=0;	//used to access positions in bitArray
+		for(int x=0;x<temp.length-bitArray.length;x++)
+		{
+			temp[x]=signBit;
+		}
+		for(int x=temp.length-bitArray.length;x<temp.length;x++)
+		{
+			temp[x]=bitArray[increment];
+			increment++;
+		}
+	}
+	public static Bit[] special(Bit[] x, Bit[] y)
+	{
+		if(x.length<y.length)
+			SignExtension(x,y.length);
+		if(y.length<x.length)
+			SignExtension(y,x.length);
+		Bit[] output = x;
+		for(int bit = 0; bit<output.length;bit++)
+		{
+			if(x[bit].booleanValue() == y[bit].booleanValue());
+			else
+				output[bit]=NOR(x[bit],y[bit]);	
 		}
 		return output;
 	}
 	public static void rotateRightNoCarry(Bit[] b) //WARNING: Changes actual Bit array
 	{
 		Bit holder = b[b.length-1];
-		for(int x=0;x<b.length;x++)
+		for(int x=b.length-1;x>0;x--)
 		{
-			b[x]=b[x+1];
+			b[x]=b[x-1];
 		}
 		b[0]=holder;
 	}
 	public static void rotateLeftNoCarry(Bit[] b) //WARNING: Changes actual Bit array
 	{
 		Bit holder = b[0];
-		for(int x=b.length-2;x>=0;x--)
+		for(int x=0;x<b.length-1;x++)
 		{
-			b[x]=b[x-1];
+			b[x]=b[x+1];
 		}
 		b[b.length-1]=holder;
 	}
@@ -327,7 +383,7 @@ public final class Bit implements Serializable, Comparable<Bit>
 		if(s.indexOf("1") == -1)
 			return key = new Bit[]{new Bit(false)};
 		int index=s.indexOf("1");
-		for(int x=key.length-s.length();x<key.length&&index<s.length();x++)
+		for(int x=key.length-s.length();x<key.length;x++)
 		{
 			key[x]= (s.charAt(index)=='1') ? TRUE : FALSE;
 			index++;
@@ -338,24 +394,34 @@ public final class Bit implements Serializable, Comparable<Bit>
 	{
 		if(b>=0)
 			return bitValue(Integer.toBinaryString((int)b));
+		if(b==-1)
+			return new Bit[]{TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE};
 		return NOT(bitValue(Integer.toBinaryString((int)((-b)-1))));
 	}	
 	public static Bit[] bitValue(int b) //signed
 	{
 		if(b>=0)
 			return bitValue(Integer.toBinaryString(b));
+		if(b==-1)
+			return new Bit[]{TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE};
 		return NOT(bitValue(Integer.toBinaryString((-b)-1)));
 	}
 	public static Bit[] bitValue(long b) //signed
 	{
 		if(b>=0)
 			return bitValue(Long.toBinaryString(b));
+		if(b==-1)
+			return new Bit[]{TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE};
 		return NOT(bitValue(Long.toBinaryString((-b)-1)));
 	}
 	public static byte byteValue(Bit[] b) throws NumberFormatException
 	{
 		if(b.length>8)
 			throw new NumberFormatException();
+		if(b[0].equals(TRUE))
+		{
+			return (byte)((Byte.parseByte(toBinaryString(NOT(b)),2)+1)*-1);
+		}
 		return (byte)((Byte.parseByte(toBinaryString(b),2)));
 	}
 	public static char charValue(Bit[] b) throws NumberFormatException
@@ -368,18 +434,30 @@ public final class Bit implements Serializable, Comparable<Bit>
 	{
 		if(b.length>16)
 			throw new NumberFormatException();
+		if(b[0].equals(TRUE))
+		{
+			return (short)((Short.parseShort(toBinaryString(NOT(b)),2)+1)*-1);
+		}
 		return (short)((Short.parseShort(toBinaryString(b),2)));
 	}
 	public static int intValue(Bit[] b) throws NumberFormatException
 	{
 		if(b.length>32)
 			throw new NumberFormatException();
+		if(b[0].equals(TRUE))
+		{
+			return (int)((Integer.parseInt(toBinaryString(NOT(b)),2)+1)*-1);
+		}
 		return (int)((Integer.parseInt(toBinaryString(b),2)));
 	}
 	public static long longValue(Bit[] b) throws NumberFormatException
 	{
 		if(b.length>64)
 			throw new NumberFormatException();
+		if(b[0].equals(TRUE))
+		{
+			return (long)((Long.parseLong(toBinaryString(NOT(b)),2)+1)*-1);
+		}
 		return (long)((Long.parseLong(toBinaryString(b),2)));
 	}
 	private static String toBinaryString(Bit[] b)
