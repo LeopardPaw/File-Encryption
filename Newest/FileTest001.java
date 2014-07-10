@@ -9,35 +9,25 @@ class FileTest
 {
 	public static void main(String[] args)
 	{
-		//BufferedReader data;
 		Scanner fix=new Scanner(in); 
 		String input="";
 		while(true)
 		{
-			input="";
 			out.print("Enter file name:: ");
 			input=fix.nextLine();
-			try(BufferedReader data=new BufferedReader(new InputStreamReader(new FileInputStream(input))))
+			try
 			{
-				Bit[] key1,key2,key3;
-				String holder=""; //used to hold key values
-				//input="";
-				//out.print("Enter file name:: ");
-				//input=fix.nextLine();
-				//data=new BufferedReader(new InputStreamReader(new FileInputStream(input)));
+				Bit[] key1,key2,key3; //declares keys
 				out.print("Enter new file name:: ");
-				input=fix.nextLine();
+				String newFile=fix.nextLine();
 				out.print("Enter key1:: ");
-				holder=Integer.toBinaryString(fix.nextInt());
-				key1=assign(holder);
+				key1=Bit.bitValue(fix.nextLong());
 				out.print("Enter key2:: ");
-				holder=Integer.toBinaryString(fix.nextInt());
-				key2=assign(holder);
+				key2=Bit.bitValue(fix.nextLong());
 				out.print("Enter key3:: ");
-				holder=Integer.toBinaryString(fix.nextInt());
-				key3=assign(holder);
-				//encipher(data,input,key1,key2,key3); //creates file 
-				//decipher(encipher(data,input,key1,key2,key3));			
+				key3=Bit.bitValue(fix.nextLong());
+				//encipher(data,input,key1,key2,key3); 			//creates file 
+				decipher(encipher(input,newFile,key1,key2,key3));			
 			}
 	
 			catch(NumberFormatException e)
@@ -52,113 +42,117 @@ class FileTest
 			finally
 			{
 				out.print("Continue? (Y/N) ");
-				char x = fix.next().charAt(0);
-				fix.nextLine();
-				if(x!='Y'&&x!='y')
+				try
+				{
+					char x = fix.nextLine().charAt(0);
+					if(x!='Y'&&x!='y')
+						return;
+					out.println();
+				}
+				catch(StringIndexOutOfBoundsException e)
+				{
 					return;
-				out.println();
+				}
 			}
 		}
 	}
 
-	public static File encipher(BufferedReader data,String input,Bit[] key1,Bit[] key2,Bit[] key3)
+	public static File encipher(String inputFile,String newFile,Bit[] key1,Bit[] key2,Bit[] key3) throws IOException
 	{
-		ArrayList<Bit> buff=new ArrayList<>();
-		File output = new File(input); //input == name of file
-		DataOutputStream outputWriter;
-		try
+		ArrayList<Bit[]> buff=new ArrayList<>();
+		ArrayList<Bit[]> buff2 =new ArrayList<>();
+		File output = new File(newFile); //input == name of file
+		//Original algorithm: (Input XOR key1) AND (key2 XOR key3)
+		//New algorithm:: rotateRightNoCarry(input);XOR(input,key1);rotateLeftNoCarry(input);
+		//			   XOR(input,key2);AND(input,key3);rotateRightNoCarry(input);
+		//			   rotateRightNoCarry(input); 
+		try(DataOutputStream outputWriter = new DataOutputStream(new FileOutputStream(output));DataInputStream data = new DataInputStream(inputFile))
 		{
-			outputWriter = new DataOutputStream(new FileOutputStream(output));
+			try
+			{
+				while(true)
+					buff.add(Bit.bitValue(data.readByte()));
+			}
+			catch(EOFException e)
+			{break;}
+
+			for(int x=0;x<buff.size()/8;x+=8) 									//encrypts input
+			{
+				Bit[] bitArray = {buff.get(x),buff.get(x+1),buff.get(x+2)
+					buff.get(x+3),buff.get(x+4),buff.get(x+5),
+					buff.get(x+6),buff.get(x+7)};
+				Bit.rotateRightNoCarry(bitArray);
+				bitArray = Bit.XOR(bitArray,key1);
+				Bit.rotateLeftNoCarry(bitArray);
+				bitArray = Bit.XOR(bitArray,key2);
+				bitArray = Bit.AND(bitArray,key3);
+				Bit.rotateRightNoCarry(bitArray);
+				Bit.rotateRightNoCarry(bitArray);	
+				buff2.add(bitArray);
+				buff.remove();
+				buff.remove();
+				buff.remove();
+				buff.remove();
+				buff.remove();
+				buff.remove();
+				buff.remove();
+				buff.remove();
+			}
+			Bit.rotateRightNoCarry(key2);										//rotates key2 one position right
+			outputWriter.writeChar(Bit.charValue(key2));							//writes hidden key2 to output
+			outputWriter.writeChar(Bit.charValue(Bit.AND(Bit.XOR(key1,key2),key3)));	//writes hidden key1 to output
+			Bit.rotateRightNoCarry(key3);										//rotates key3 one position right
+			key3 = Bit.XOR(key2,key3);										//creates dependency on key2 for decryption
+			Bit.rotateRightNoCarry(key3);										//rotates hidden key3 one position right
+			outputWriter.writeChar(Bit.charValue(key3));							//writes hidden key3 to output	
+			for(Bit[] x : buff2)												//writes to file
+			{
+				outputWriter.writeChar(Bit.charValue(x));
+			}
+			return output;	
 		}
 		catch(FileNotFoundException e)
 		{
 			return null;
-		} 
-		try
-		{
-			Bit[] key4=Bit.or(key3;	//convenience
-			//key4.or(key2);		//"	"
-			while(true)
-			{
-				BitSet key5=(BitSet)key1.clone();
-				key5.xor(key2);											//used to hide key1
-				key3.xor(key5);											//used to hide key3
-				outputWriter.writeByte((int)(key2.toLongArray())[0]);	//writes key2 to output
-				outputWriter.writeByte((int)(key1.toLongArray())[0]);	//writes hidden key1 to output
-				outputWriter.writeByte((int)(key3.toLongArray())[0]);	//writes hidden key3 to output	
-				break;
-			}
-			while(true)
-			{
-				buff.add(BitSet.valueOf(new byte[]{new Integer(data.read()).byteValue()}));
-				if (buff.get(buff.size()-1)==(BitSet.valueOf(new byte[]{new Integer(-1).byteValue()})));
-				{
-					buff.remove(buff.size()-1);
-					break;
-				}
-			}
-
-			for(BitSet x:buff)
-			{
-				x.xor(key1);
-				x.and(key4);	
-				outputWriter.writeByte((int)(x.toLongArray())[0]);
-			}
-		}
-		catch(IOException e)
-		{
-			return output;
-		}
-		return output;
+		}	
 	}
 	
 	public static File decipher(File input)
 	{
-		File output=new File(input.getPath()+input.getName().substring(0,input.getName().lastIndexOf("."))+"Decrypted");
-		ArrayList<BitSet> buff=new ArrayList<>();
-		BufferedReader outputTester;
-		DataOutputStream outputWriter;
-		BitSet key1=new BitSet(8),key2=new BitSet(8),key4=new BitSet(8);
-		try
+		File output=new File(input.getPath()+input.getName()+"Decrypted");
+		ArrayList<Bit[]> buff=new ArrayList<>();
+		try(BufferedReader outputTester=new BufferedReader(new InputStreamReader(new FileInputStream(input)));DataOutputStream outputWriter=new DataOutputStream(new FileOutputStream(output)))
 		{
-			outputTester=new BufferedReader(new InputStreamReader(new FileInputStream(input)));
-			outputWriter=new DataOutputStream(new FileOutputStream(output));
-		}
-		catch(FileNotFoundException e)
-		{
-			out.println("This should never happen...");
-			return null;
-		}
-		try
-		{
-			key2=BitSet.valueOf(new byte[] {new Integer(outputTester.read()).byteValue()});
-			key1=BitSet.valueOf(new byte[] {new Integer(outputTester.read()).byteValue()});
-			key4=BitSet.valueOf(new byte[] {new Integer(outputTester.read()).byteValue()});
-			key4.xor(key1);
-			key1.xor(key2);
-			key4.or(key2);
+			Bit[] key2 = Bit.bitValue(outputTester.readShort());
+			Bit.rotateLeftNoCarry(key2);
+			Bit[] key1 = Bit.bitValue(outputTester.readShort());
+			Bit[] key3 = Bit.bitValue(outputTester.readShort());
+			Bit.rotateLeftNoCarry(key3);
+			key3 = Bit.XOR(key2,key3);
+			Bit.rotateLeftNoCarry(key3);
+			key1 = Bit.special(Bit.XOR(key1,key2),key3);
 			while(true)
 			{
-				buff.add(BitSet.valueOf(new byte[]{new Integer(outputTester.read()).byteValue()}));
-				if (buff.get(buff.size()-1)==(BitSet.valueOf(new byte[]{new Integer(-1).byteValue()})));
+				try
 				{
-					buff.remove(buff.size()-1);
+					buff.add(Bit.bitValue(outputTester.readChar()));
+				}
+				catch(EOFException e)
+				{
 					break;
 				}
 			}
-			for(BitSet x:buff)
+			for(int x=0;x<buff.size();x++)
 			{
-				BitSet fix=(BitSet)x.clone();
-				BitSet fix2=(BitSet)x.clone();
-				int inc=0;
-				while(inc<x.size())
-				{
-					if(!x.get(inc) && !fix.get(inc))
-						fix2.set(inc,false);
-					fix2.set(inc,!(x.get(inc)^fix.get(inc)));
-					inc++;
-				}
-				outputWriter.writeByte((int)(x.toLongArray())[0]);
+				Bit[] bitArray = buff.get(x);
+				Bit.rotateLeftNoCarry(bitArray);
+				Bit.rotateLeftNoCarry(bitArray);
+				bitArray = Bit.special(bitArray,key3);
+				bitArray = Bit.XOR(bitArray,key2);
+				Bit.rotateRightNoCarry(bitArray);
+				bitArray = Bit.XOR(bitArray,key1);
+				Bit.rotateLeftNoCarry(bitArray);
+				buff2.add(bit
 			}
 		}
 		catch(IOException e)
@@ -166,19 +160,5 @@ class FileTest
 			return output;
 		}
 		return output;
-	}
-	private static Bit[] assign (String s)
-	{
-		Bit[] key;
-		int index=s.indexOf("1");
-		if(index==-1)
-			return key= new Bit[]{new Bit(false)};
-		s=s.substring(index,s.length());
-		key=new Bit[s.length()];
-		for(index=0;index<key.length;index++)
-		{
-			key[index]= (s.substring(index,index+1).equals("1")) ? new Bit(true) : new Bit(false);
-		}
-		return key;
 	}
 }

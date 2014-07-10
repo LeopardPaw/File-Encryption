@@ -324,7 +324,7 @@ public final class Bit implements Serializable, Comparable<Bit>
 			increment++;
 		}
 	}
-	public static Bit[] special(Bit[] x, Bit[] y)
+	public static Bit[] special(Bit[] x, Bit[] y) //Derives key1 where key1 AND key2 == key3, given key2 and key3
 	{
 		if(x.length<y.length)
 			SignExtension(x,y.length);
@@ -380,8 +380,6 @@ public final class Bit implements Serializable, Comparable<Bit>
 					    FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
 					    FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
 					    FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE};
-		if(s.indexOf("1") == -1)
-			return key = new Bit[]{new Bit(false)};
 		int index=s.indexOf("1");
 		for(int x=key.length-s.length();x<key.length;x++)
 		{
@@ -390,28 +388,73 @@ public final class Bit implements Serializable, Comparable<Bit>
 		}
 		return key;
 	}
+	public static Bit[] bitValue(byte b)
+	{
+		if(b == 0)
+			return new Bit[]{FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE};
+		if(b > 0)
+			return bitValue(Integer.toBinaryString((int) b);
+		if(b == -1)
+			return new Bit[]{TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE};
+		return NOT(bitValue(Integer.toBinaryString((int)((-b)-1))));
+	}
+	public static Bit[] bitValue(char b)
+	{
+		if (b == 0)
+			return new Bit[]{FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE};
+		return bitValue(Integer.toBinaryString((int)b));
+	}
 	public static Bit[] bitValue(short b) //signed
 	{
-		if(b>=0)
+		if (b == 0)
+			return new Bit[]{FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE};
+		if(b>0)
 			return bitValue(Integer.toBinaryString((int)b));
 		if(b==-1)
-			return new Bit[]{TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE};
+			return new Bit[]{TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
+						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE};
 		return NOT(bitValue(Integer.toBinaryString((int)((-b)-1))));
 	}	
 	public static Bit[] bitValue(int b) //signed
 	{
+		if (b == 0)
+			return new Bit[]{FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE};
 		if(b>=0)
 			return bitValue(Integer.toBinaryString(b));
 		if(b==-1)
-			return new Bit[]{TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE};
+			return new Bit[]{TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
+						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
+						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
+						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE};
 		return NOT(bitValue(Integer.toBinaryString((-b)-1)));
 	}
-	public static Bit[] bitValue(long b) //signed
+	public static Bit[] bitValue(long b) //signed, 
 	{
+		if (b == 0)
+			return new Bit[]{FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
+						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE};
 		if(b>=0)
 			return bitValue(Long.toBinaryString(b));
 		if(b==-1)
-			return new Bit[]{TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE};
+			return new Bit[]{TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
+						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
+						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
+						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
+						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
+						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
+						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
+						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE};
 		return NOT(bitValue(Long.toBinaryString((-b)-1)));
 	}
 	public static byte byteValue(Bit[] b) throws NumberFormatException

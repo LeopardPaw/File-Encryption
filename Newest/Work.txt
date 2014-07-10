@@ -1,0 +1,40 @@
+Given:
+	10101010 //original input
+	10011001 //key1
+	00010001 //key2
+	11001100 //key3
+Equation:
+	(Input XOR key1) AND (key2 OR key3)
+Output:
+	(10101010 XOR 10011001) AND (00010001 OR 11001100)
+	00110011 AND (00010001 OR 11001100)
+	00110011 AND 11011101
+	00010001
+Reverse:
+	00010001=(Input XOR key1) AND (key2 OR y)		//key3 is hidden by assigning it the value of key1 after finishing the equation
+	00010001=(Input XOR 10011001) AND (00010001 OR y)	//(i.e. key3==key1)
+	00010001=(10101010 XOR 10011001) AND (00010001 OR y)	//input never changed by program
+	00010001=(00110011) AND (00010001 OR y)			//simplified
+	----
+	00010001=00110011 AND x					//simpified to x
+	----------------------------------------------------------------------------------------------
+	00010001=(x XOR 10011001) AND (key2 OR key3)
+	00010001=(x XOR 10011001) AND (key4)			//key4 defined as key2 OR key3
+	(x XOR 10011001) = special(key4, 00010001)		//special removes AND, see Bit.java
+------------------------------------------------------------------------------------------------------
+key hiding in FileTest001
+	encrypt: 
+		rotate key2 to the right(no carry), write to output
+		key1 = AND (XOR(key1, key2), key3), write to output
+		rotate key3 to the right(no carry), key3 = XOR(key2, key3),
+		rotate key3 to the right(no carry), write key3 to output
+	decrypt:
+		key2 = bitValue(input.nextLong());
+		key2.rotateLeftNoCarry();		//finished key2
+		key1 = bitValue(input.nextLong());
+		key3 = bitValue(input.nextLong());
+		key3.rotateLeftNoCarry();
+		key3 = XOR(key2,key3);
+		rotateLeftNoCarry(key3);		//finished key3
+		key1 = special(XOR(key1,key2),key3);		//finished key1
+	

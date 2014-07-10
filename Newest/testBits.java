@@ -14,29 +14,41 @@ class Test
 		Scanner scan = new Scanner(in);
 		while(true)
 		{
+			out.print("Enter a character:: ");
+			char input = scan.next().charAt(0);
+			Bit[] _value = Bit.bitValue(input);
 			out.print("Enter an integer:: ");
-			long input = Long.parseLong(scan.nextLine(),10);
-			Bit[] out1 = Bit.bitValue(input);
-			Bit[] out2 = Bit.bitValue(input);
-			out.println("Original:: "+Bit.inBinary(out1));
-			//Bit.rotateRightNoCarry(out2);
-			//out.println(Bit.inBinary(out2));
-			//out.print("Enter an integer:: ");
-			//input=Long.parseLong(scan.nextLine(),10);
-			//Bit[] out2 = Bit.bitValue(input);
-			//Bit[] out3 = Bit.AND(out1,out2);
-			//out.println(Bit.inBinary(out1)+"\nAND\n"+Bit.inBinary(out2)+"\n------------\n"+Bit.inBinary(out3));
-			//Bit[] out4 = Bit.special(out2,out3);
-			//Bit[] out5 = Bit.special(out1,out3);
-			//Bit[] out3 = out2;
-			Bit.rotateLeftNoCarry(out2);
-			out.println(Bit.inBinary(out2));
-		//	if(Arrays.equals(out1,out2))
+			Bit[] key1 = Bit.bitValue(scan.nextShort());
+			out.print("Enter an integer:: ");
+			Bit[] key2 = Bit.bitValue(scan.nextShort());
+			out.print("Enter an integer:: ");
+			Bit[] key3 = Bit.bitValue(scan.nextShort());
+			encipher(_value,key1,key2,key3);
+			decipher(_value,key1,key2,key3);
+			out.println("\t"+Bit.charValue(key1));
+		/*	out.print("Enter an integer:: ");
+		//	long input = Long.parseLong(scan.nextLine(),10);
+		//	Bit[] key1 = Bit.bitValue(input);
+		//	Bit[] _key1 = Bit.bitValue(input);
+		//	out.print("Enter an integer:: ");
+		//	input = Long.parseLong(scan.nextLine(),10);
+		//	Bit[] key2 = Bit.bitValue(input);
+		//	Bit[] _key2 = Bit.bitValue(input);
+		//	out.print("Enter an integer:: ");
+		//	input = Long.parseLong(scan.nextLine(),10);
+		//	Bit[] key3 = Bit.bitValue(input);
+		//	Bit[] _key3 = Bit.bitValue(input);
+		//	encipher(key1,key2,key3);
+		//	decipher(key1,key2,key3);
+		//	if(Arrays.equals(key1,_key1) && Arrays.equals(key2,_key2) && Arrays.equals(key3,_key3))
 		//		out.println("Success");
 		//	else
 		//	{
 		//		out.println("Failure");
-		//		out.println(Bit.inBinary(out1)+"\n"+Bit.inBinary(out2));
+		//		out.println(Bit.inBinary(key1)+"---->"+Bit.inBinary(_key1));
+		//		out.println(Bit.inBinary(key2)+"---->"+Bit.inBinary(_key2));
+		//		out.println(Bit.inBinary(key3)+"---->"+Bit.inBinary(_key3));
+		//	
 		//	}
 		//	out.println("Number:: "+input);
 		//	out.println("Unsigned binary:: "+Long.toBinaryString(input));
@@ -69,7 +81,7 @@ class Test
 		//				}
 		//			}
 		//		}
-		//	}
+			}*/
 			out.print("Continue? (Y/N) ");
 			try
 			{
@@ -83,5 +95,26 @@ class Test
 				return;
 			}
 		}
+	}
+	public static void encipher(Bit[] _value,Bit[] key1,Bit[] key2, Bit[] key3)
+	{
+		Bit[] temp2 = Bit.XOR(key2,key3);
+		_value = Bit.AND(Bit.XOR(_value,key1),temp2);
+		Bit.rotateRightNoCarry(key2);
+		key1 = Bit.AND(Bit.XOR(key1,key2),key3);
+		Bit.rotateRightNoCarry(key3);
+		key3 = Bit.XOR(key2,key3);
+		Bit.rotateRightNoCarry(key3);
+		
+	}
+	public static void decipher(Bit[] _value,Bit[] key1, Bit[] key2,Bit[] key3)
+	{
+		Bit.rotateLeftNoCarry(key2);
+		Bit.rotateLeftNoCarry(key3);
+		key3 = Bit.XOR(key2,key3);
+		Bit.rotateLeftNoCarry(key3);
+		key1 = Bit.special(Bit.XOR(key1,key2),key3);
+		Bit[] temp1 = Bit.XOR(key2,key3);
+		_value = Bit.special(Bit.XOR(_value,key1),temp1);
 	}
 }
