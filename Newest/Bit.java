@@ -1,18 +1,9 @@
 package com.tigerwolf.encryption;
 import static java.lang.Math.*;
-import java.lang.Comparable;
-import java.lang.String;
-import java.lang.Class;
-import java.lang.Boolean;
-import java.lang.System;
-import java.lang.SecurityException;
-import java.lang.NullPointerException;
-import java.lang.IllegalArgumentException;
-import java.lang.NumberFormatException;
-import java.lang.ArrayIndexOutOfBoundsException;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 
 //This class is used to redefine Boolean indirectly
 //Adds Bitwise operations to class
@@ -21,6 +12,7 @@ public final class Bit implements Serializable, Comparable<Bit>
 	public static final Class<Boolean> TYPE = Boolean.TYPE;
 	public static final Bit TRUE = new Bit(true);
 	public static final Bit FALSE = new Bit(false);
+	private static final long serialVersionUID = -6334195800985631469L;
 	private final boolean value;
 	public Bit(boolean value)
 	{
@@ -307,22 +299,23 @@ public final class Bit implements Serializable, Comparable<Bit>
 		}
 		return output;
 	}
-	public static void SignExtension(Bit[] bitArray,int numBits)
+	public static Bit[] SignExtension(Bit[] bitArray,int numBits)
 	{
 		if(numBits<=bitArray.length)
-			return;
+			return bitArray;
 		Bit signBit = bitArray[0];
 		Bit[] temp=new Bit[numBits];
-		int increment=0;	//used to access positions in bitArray
+		//int increment=0;	//used to access positions in bitArray
 		for(int x=0;x<temp.length-bitArray.length;x++)
 		{
 			temp[x]=signBit;
 		}
-		for(int x=temp.length-bitArray.length;x<temp.length;x++)
+		for(int x=temp.length-bitArray.length,increment=0;x<temp.length;x++)
 		{
 			temp[x]=bitArray[increment];
 			increment++;
 		}
+		return temp;
 	}
 	public static Bit[] special(Bit[] x, Bit[] y) //Derives key1 where key1 AND key2 == key3, given key2 and key3
 	{
@@ -330,12 +323,12 @@ public final class Bit implements Serializable, Comparable<Bit>
 			SignExtension(x,y.length);
 		if(y.length<x.length)
 			SignExtension(y,x.length);
-		Bit[] output = x;
+		Bit[] output = new Bit[x.length];
 		for(int bit = 0; bit<output.length;bit++)
 		{
-			if(x[bit].booleanValue() == y[bit].booleanValue());
+			if(x[bit].value && y[bit].value);
 			else
-				output[bit]=NOR(x[bit],y[bit]);	
+				output[bit]=NOR(x[bit],y[bit]);
 		}
 		return output;
 	}
@@ -357,7 +350,7 @@ public final class Bit implements Serializable, Comparable<Bit>
 		}
 		b[b.length-1]=holder;
 	}
-	public static Bit[] bitValue(String s)
+	public static Bit[] bitValues(String s) //returns binary representation of caller
 	{
 		//All indexes of key are defined the default value of FALSE, used to prevent Null Values
 		Bit[] key;
@@ -371,7 +364,7 @@ public final class Bit implements Serializable, Comparable<Bit>
 					    FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
 					    FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
 					    FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE};
-		else
+		else if(s.length()>32 && s.length()<65)
 			key=new Bit[]{FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
 					    FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
 					    FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
@@ -380,43 +373,55 @@ public final class Bit implements Serializable, Comparable<Bit>
 					    FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
 					    FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
 					    FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE};
+		else
+		{
+			key=new Bit[s.length()];
+			for(int k=0;k<s.length();k++)
+			{
+				key[k]=FALSE;
+			}
+		}
 		int index=s.indexOf("1");
-		for(int x=key.length-s.length();x<key.length;x++)
+		for(int x=key.length-s.length();x<key.length;x++,index++)
 		{
 			key[x]= (s.charAt(index)=='1') ? TRUE : FALSE;
-			index++;
 		}
 		return key;
 	}
-	public static Bit[] bitValue(byte b)
+	public static Bit[] bitValue(String b)
 	{
-		if(b == 0)
-			return new Bit[]{FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE};
-		if(b > 0)
-			return bitValue(Integer.toBinaryString((int) b);
-		if(b == -1)
-			return new Bit[]{TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE};
-		return NOT(bitValue(Integer.toBinaryString((int)((-b)-1))));
+		return bitValue(b.toCharArray());
+	}
+	public static Bit[] bitValue(char[] b)
+	{
+		Bit[] bits = new Bit[b.length*16];
+		for(int x=0,y=0;x<b.length;x++)
+		{
+			Bit[] temp=SignExtension(Bit.bitValue(b[x]),16);
+			for(int z=0;z<16;z++,y++)
+				bits[y]=temp[z];
+		}
+		return bits;
 	}
 	public static Bit[] bitValue(char b)
 	{
 		if (b == 0)
 			return new Bit[]{FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
 						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE};
-		return bitValue(Integer.toBinaryString((int)b));
+		return bitValues(Integer.toBinaryString((int)b));
 	}
 	public static Bit[] bitValue(short b) //signed
 	{
 		if (b == 0)
 			return new Bit[]{FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
 						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE};
-		if(b>0)
-			return bitValue(Integer.toBinaryString((int)b));
+		if(b>=0)
+			return bitValues(Integer.toBinaryString((int)b));
 		if(b==-1)
 			return new Bit[]{TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
 						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE};
-		return NOT(bitValue(Integer.toBinaryString((int)((-b)-1))));
-	}	
+		return NOT(bitValues(Integer.toBinaryString((-b)-1)));
+	}
 	public static Bit[] bitValue(int b) //signed
 	{
 		if (b == 0)
@@ -425,15 +430,15 @@ public final class Bit implements Serializable, Comparable<Bit>
 						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
 						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE};
 		if(b>=0)
-			return bitValue(Integer.toBinaryString(b));
+			return bitValues(Integer.toBinaryString(b));
 		if(b==-1)
 			return new Bit[]{TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
 						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
 						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
 						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE};
-		return NOT(bitValue(Integer.toBinaryString((-b)-1)));
+		return NOT(bitValues(Integer.toBinaryString((-b)-1)));
 	}
-	public static Bit[] bitValue(long b) //signed, 
+	public static Bit[] bitValue(long b) //signed
 	{
 		if (b == 0)
 			return new Bit[]{FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
@@ -445,7 +450,7 @@ public final class Bit implements Serializable, Comparable<Bit>
 						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,
 						  FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE};
 		if(b>=0)
-			return bitValue(Long.toBinaryString(b));
+			return bitValues(Long.toBinaryString(b));
 		if(b==-1)
 			return new Bit[]{TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
 						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
@@ -455,7 +460,20 @@ public final class Bit implements Serializable, Comparable<Bit>
 						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
 						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,
 						  TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE};
-		return NOT(bitValue(Long.toBinaryString((-b)-1)));
+		return NOT(bitValues(Long.toBinaryString((-b)-1)));
+	}
+	public static String stringValue(Bit[] b) //parses as unicode
+	{
+		String output="";
+		if(b.length%8!=0)
+			SignExtension(b,b.length*16);
+		for(int x=0;x<b.length;x=x+16)
+		{
+			Bit[] temp = new Bit[16];
+			System.arraycopy(b,x,temp,0,16);
+			output+=charValue(temp);
+		}
+		return output;
 	}
 	public static byte byteValue(Bit[] b) throws NumberFormatException
 	{
@@ -465,13 +483,13 @@ public final class Bit implements Serializable, Comparable<Bit>
 		{
 			return (byte)((Byte.parseByte(toBinaryString(NOT(b)),2)+1)*-1);
 		}
-		return (byte)((Byte.parseByte(toBinaryString(b),2)));
+		return Byte.parseByte(toBinaryString(b),2);
 	}
 	public static char charValue(Bit[] b) throws NumberFormatException
 	{
 		if(b.length>16)
 			throw new NumberFormatException();
-		return (char)(Short.parseShort(toBinaryString(b),2));
+		return (char)(Integer.parseInt(toBinaryString(b),2));
 	}
 	public static short shortValue(Bit[] b) throws NumberFormatException
 	{
@@ -481,7 +499,7 @@ public final class Bit implements Serializable, Comparable<Bit>
 		{
 			return (short)((Short.parseShort(toBinaryString(NOT(b)),2)+1)*-1);
 		}
-		return (short)((Short.parseShort(toBinaryString(b),2)));
+		return Short.parseShort(toBinaryString(b),2);
 	}
 	public static int intValue(Bit[] b) throws NumberFormatException
 	{
@@ -489,9 +507,9 @@ public final class Bit implements Serializable, Comparable<Bit>
 			throw new NumberFormatException();
 		if(b[0].equals(TRUE))
 		{
-			return (int)((Integer.parseInt(toBinaryString(NOT(b)),2)+1)*-1);
+			return (Integer.parseInt(toBinaryString(NOT(b)),2)+1)*-1;
 		}
-		return (int)((Integer.parseInt(toBinaryString(b),2)));
+		return (Integer.parseInt(toBinaryString(b),2));
 	}
 	public static long longValue(Bit[] b) throws NumberFormatException
 	{
@@ -499,9 +517,9 @@ public final class Bit implements Serializable, Comparable<Bit>
 			throw new NumberFormatException();
 		if(b[0].equals(TRUE))
 		{
-			return (long)((Long.parseLong(toBinaryString(NOT(b)),2)+1)*-1);
+			return (Long.parseLong(toBinaryString(NOT(b)),2)+1)*-1;
 		}
-		return (long)((Long.parseLong(toBinaryString(b),2)));
+		return (Long.parseLong(toBinaryString(b),2));
 	}
 	private static String toBinaryString(Bit[] b)
 	{
@@ -511,5 +529,85 @@ public final class Bit implements Serializable, Comparable<Bit>
 			binaryString+= (b[x].booleanValue()) ? 1 : 0;
 		}
 		return binaryString;
+	}
+	public static boolean[] toBooleanArray(Bit[] b)
+	{
+		boolean[] bArray = new boolean[b.length];
+		for(int x=0;x<b.length;x++)
+			bArray[x]=b[x].value;
+		return bArray;
+	}
+	public static String runlengthEncode(String pt) //implements runlength encoding
+	{
+		if(pt.length()==0)
+			return pt;
+		return runlengthEncode(pt.toCharArray());
+	}
+	private static String runlengthEncode(char[] pt)
+	{
+		String ct = "";
+		int run = 0;
+		char current;
+		for(int x=0;x<pt.length;)
+		{
+			current = pt[x];
+			while(x<pt.length&&pt[x++]==current)
+				run++;
+			ct += current+" "+run+" ";
+			run = 1;
+		}
+		return ct;
+	}
+	public static String runlengthDecode(String ct) throws java.io.IOException
+	{
+		if(ct.length() == 0)
+			return ct;
+		String[] vals = ct.split(" ");
+		char[] chars=new char[1];
+		int counts;
+		ct = "";
+		for(int x=0;x<vals.length;x++)
+		{
+			if(x%2==0)
+				chars[0]=vals[x].charAt(0);
+			else
+			{
+				for(counts=Integer.parseInt(vals[x]);counts>0;counts--)
+					ct+=chars[0]+"";
+			}
+		}
+		return ct;
+	}
+	public static Bit[] compress(Bit[] b)
+	{
+		return compress(b, b[0],b[1]);
+	}
+	public static Bit[] compressString(String s)
+	{
+		char[] chars = s.toCharArray();
+		ArrayList <Bit> bits = new ArrayList<Bit>();
+		for(char c : chars)
+			bits.addAll(Arrays.asList(compress(bitValue(c))));
+		return bits.toArray(new Bit[]{});
+	}
+	private static Bit[] compress(Bit[] b, Bit pos,Bit pos2)
+	{
+		if(pos2.value)
+		{
+			return b;
+		}
+		return compress(Arrays.copyOfRange(b,1,b.length),b[1],b[2]);
+	}
+	public static byte[] compress(boolean[] b)
+	{
+		return new byte[1];
+	}
+	static byte[] compressHelper(Bit[] b)
+	{
+		return new byte[1];
+	}
+	static byte[] compressHelper(boolean[] b)
+	{
+		return new byte[1];
 	}
 }

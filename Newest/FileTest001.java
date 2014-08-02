@@ -21,11 +21,11 @@ class FileTest
 				out.print("Enter new file name:: ");
 				String newFile=fix.nextLine();
 				out.print("Enter key1:: ");
-				key1=Bit.bitValue(fix.nextLong());
+				key1=Bit.bitValue(fix.next().charAt(0));
 				out.print("Enter key2:: ");
-				key2=Bit.bitValue(fix.nextLong());
+				key2=Bit.bitValue(fix.next().charAt(0));
 				out.print("Enter key3:: ");
-				key3=Bit.bitValue(fix.nextLong());
+				key3=Bit.bitValue(fix.next().charAt(0));
 				//encipher(data,input,key1,key2,key3); 			//creates file 
 				decipher(encipher(input,newFile,key1,key2,key3));			
 			}
@@ -42,6 +42,7 @@ class FileTest
 			finally
 			{
 				out.print("Continue? (Y/N) ");
+				fix.nextLine();
 				try
 				{
 					char x = fix.nextLine().charAt(0);
@@ -60,27 +61,23 @@ class FileTest
 	public static File encipher(String inputFile,String newFile,Bit[] key1,Bit[] key2,Bit[] key3) throws IOException
 	{
 		ArrayList<Bit[]> buff=new ArrayList<>();
-		ArrayList<Bit[]> buff2 =new ArrayList<>();
 		File output = new File(newFile); //input == name of file
 		//Original algorithm: (Input XOR key1) AND (key2 XOR key3)
 		//New algorithm:: rotateRightNoCarry(input);XOR(input,key1);rotateLeftNoCarry(input);
 		//			   XOR(input,key2);AND(input,key3);rotateRightNoCarry(input);
 		//			   rotateRightNoCarry(input); 
-		try(DataOutputStream outputWriter = new DataOutputStream(new FileOutputStream(output));DataInputStream data = new DataInputStream(inputFile))
+		try(BufferedWriter outputWriter = new BufferedWriter(new FileWriter(output));BufferedReader data = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile))))
 		{
-			try
+			while(true)
 			{
-				while(true)
-					buff.add(Bit.bitValue(data.readByte()));
+				int tester = data.read();
+				if(tester == -1)
+					break;
+				buff.add(Bit.bitValue(tester));
 			}
-			catch(EOFException e)
-			{break;}
-
-			for(int x=0;x<buff.size()/8;x+=8) 									//encrypts input
+			for(int x=0;x<buff.size();x++) 									//encrypts input
 			{
-				Bit[] bitArray = {buff.get(x),buff.get(x+1),buff.get(x+2)
-					buff.get(x+3),buff.get(x+4),buff.get(x+5),
-					buff.get(x+6),buff.get(x+7)};
+				Bit[] bitArray = buff.get(x);
 				Bit.rotateRightNoCarry(bitArray);
 				bitArray = Bit.XOR(bitArray,key1);
 				Bit.rotateLeftNoCarry(bitArray);
@@ -88,26 +85,18 @@ class FileTest
 				bitArray = Bit.AND(bitArray,key3);
 				Bit.rotateRightNoCarry(bitArray);
 				Bit.rotateRightNoCarry(bitArray);	
-				buff2.add(bitArray);
-				buff.remove();
-				buff.remove();
-				buff.remove();
-				buff.remove();
-				buff.remove();
-				buff.remove();
-				buff.remove();
-				buff.remove();
+				buff.set(x,bitArray);
 			}
 			Bit.rotateRightNoCarry(key2);										//rotates key2 one position right
-			outputWriter.writeChar(Bit.charValue(key2));							//writes hidden key2 to output
-			outputWriter.writeChar(Bit.charValue(Bit.AND(Bit.XOR(key1,key2),key3)));	//writes hidden key1 to output
+			outputWriter.write(Bit.charValue(key2));							//writes hidden key2 to output
+			outputWriter.write(Bit.charValue(Bit.AND(Bit.XOR(key1,key2),key3)));	//writes hidden key1 to output
 			Bit.rotateRightNoCarry(key3);										//rotates key3 one position right
 			key3 = Bit.XOR(key2,key3);										//creates dependency on key2 for decryption
 			Bit.rotateRightNoCarry(key3);										//rotates hidden key3 one position right
-			outputWriter.writeChar(Bit.charValue(key3));							//writes hidden key3 to output	
-			for(Bit[] x : buff2)												//writes to file
+			outputWriter.write(Bit.charValue(key3));							//writes hidden key3 to output	
+			for(Bit[] x : buff)												//writes to file
 			{
-				outputWriter.writeChar(Bit.charValue(x));
+				outputWriter.write(Bit.charValue(x));
 			}
 			return output;	
 		}
@@ -119,14 +108,14 @@ class FileTest
 	
 	public static File decipher(File input)
 	{
-		File output=new File(input.getPath()+input.getName()+"Decrypted");
+		File output=new File(input.getPath()+input.getName().substring(0,input.getName().lastIndexOf(".")+1)+"Decrypted"+input.getName().substring(input.lastIndexOf(File.PathSepastIndexOf(".")));
 		ArrayList<Bit[]> buff=new ArrayList<>();
 		try(BufferedReader outputTester=new BufferedReader(new InputStreamReader(new FileInputStream(input)));DataOutputStream outputWriter=new DataOutputStream(new FileOutputStream(output)))
 		{
-			Bit[] key2 = Bit.bitValue(outputTester.readShort());
+			Bit[] key2 = Bit.bitValue((short)outputTester.read());
 			Bit.rotateLeftNoCarry(key2);
-			Bit[] key1 = Bit.bitValue(outputTester.readShort());
-			Bit[] key3 = Bit.bitValue(outputTester.readShort());
+			Bit[] key1 = Bit.bitValue((short)outputTester.read());
+			Bit[] key3 = Bit.bitValue((short)outputTester.read());
 			Bit.rotateLeftNoCarry(key3);
 			key3 = Bit.XOR(key2,key3);
 			Bit.rotateLeftNoCarry(key3);
@@ -135,7 +124,7 @@ class FileTest
 			{
 				try
 				{
-					buff.add(Bit.bitValue(outputTester.readChar()));
+					buff.add(Bit.bitValue(outputTester.read()));
 				}
 				catch(EOFException e)
 				{
@@ -152,7 +141,7 @@ class FileTest
 				Bit.rotateRightNoCarry(bitArray);
 				bitArray = Bit.XOR(bitArray,key1);
 				Bit.rotateLeftNoCarry(bitArray);
-				buff2.add(bit
+				outputWriter.writeChar(Bit.charValue(bitArray));
 			}
 		}
 		catch(IOException e)
