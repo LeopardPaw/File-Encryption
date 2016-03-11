@@ -65,8 +65,8 @@ class FileTest
 		//Original algorithm: (Input XOR key1) AND (key2 XOR key3)
 		//New algorithm:: rotateRightNoCarry(input);XOR(input,key1);rotateLeftNoCarry(input);
 		//			   XOR(input,key2);AND(input,key3);rotateRightNoCarry(input);
-		//			   rotateRightNoCarry(input); 
-		try(BufferedWriter outputWriter = new BufferedWriter(new FileWriter(output));BufferedReader data = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile))))
+		//			   rotateRightNoCarry(input);
+		try(BufferedOutputStream outputWriter = new BufferedOutputStream(new FileOutputStream(output));BufferedInputStream data = new BufferedInputStream(new FileInputStream(inputFile)))
 		{
 			while(true)
 			{
@@ -88,12 +88,12 @@ class FileTest
 				buff.set(x,bitArray);
 			}
 			Bit.rotateRightNoCarry(key2);										//rotates key2 one position right
-			outputWriter.write(Bit.charValue(key2));							//writes hidden key2 to output
-			outputWriter.write(Bit.charValue(Bit.AND(Bit.XOR(key1,key2),key3)));	//writes hidden key1 to output
+			outputWriter.write(Bit.longValue(key2));							//writes hidden key2 to output
+			outputWriter.write(Bit.longValue(Bit.AND(Bit.XOR(key1,key2),key3)));	//writes hidden key1 to output
 			Bit.rotateRightNoCarry(key3);										//rotates key3 one position right
 			key3 = Bit.XOR(key2,key3);										//creates dependency on key2 for decryption
 			Bit.rotateRightNoCarry(key3);										//rotates hidden key3 one position right
-			outputWriter.write(Bit.charValue(key3));							//writes hidden key3 to output	
+			outputWriter.write(Bit.longValue(key3));							//writes hidden key3 to output	
 			for(Bit[] x : buff)												//writes to file
 			{
 				outputWriter.write(Bit.charValue(x));
@@ -108,14 +108,15 @@ class FileTest
 	
 	public static File decipher(File input)
 	{
-		File output=new File(input.getPath()+input.getName().substring(0,input.getName().lastIndexOf(".")+1)+"Decrypted"+input.getName().substring(input.lastIndexOf(File.PathSepastIndexOf(".")));
+		File output=new File(input.getPath()+input.getName().substring(0,input.getName().lastIndexOf(".")+1)+"Decrypted"+input.getName().substring(input.getName().lastIndexOf(File.pathSeparator.indexOf("."))));
 		ArrayList<Bit[]> buff=new ArrayList<>();
-		try(BufferedReader outputTester=new BufferedReader(new InputStreamReader(new FileInputStream(input)));DataOutputStream outputWriter=new DataOutputStream(new FileOutputStream(output)))
+		try(BufferedInputStream outputTester=new BufferedInputStream(new FileInputStream(input));BufferedOutputStream outputWriter=new BufferedOutputStream(new FileOutputStream(output)))
 		{
-			Bit[] key2 = Bit.bitValue((short)outputTester.read());
+			
+			Bit[] key3 = Bit.bitValue((long)outputTester.read());
 			Bit.rotateLeftNoCarry(key2);
-			Bit[] key1 = Bit.bitValue((short)outputTester.read());
-			Bit[] key3 = Bit.bitValue((short)outputTester.read());
+			Bit[] key2 = Bit.bitValue((long)outputTester.read());
+			Bit[] key1 = Bit.bitValue((long)outputTester.read());
 			Bit.rotateLeftNoCarry(key3);
 			key3 = Bit.XOR(key2,key3);
 			Bit.rotateLeftNoCarry(key3);

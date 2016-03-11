@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
-
+//@Author: Corbin Adamson
 //This class is used to redefine Boolean indirectly
 //Adds Bitwise operations to class
 public final class Bit implements Serializable, Comparable<Bit>
@@ -127,9 +127,9 @@ public final class Bit implements Serializable, Comparable<Bit>
 	public static Bit[] AND(Bit[] x, Bit[] y)
 	{
 		if(x.length<y.length)
-			SignExtension(x,y.length);
+			x = SignExtension(x,y.length);
 		if(y.length<x.length)
-			SignExtension(y,x.length);
+			y = SignExtension(y,x.length);
 		Bit[] output = new Bit[x.length];
 		for(int bit = 0; bit<output.length;bit++)
 		{
@@ -231,9 +231,9 @@ public final class Bit implements Serializable, Comparable<Bit>
 	public static Bit[] NAND(Bit[] x,Bit[] y)
 	{
 		if(x.length<y.length)
-			SignExtension(x,y.length);
+			x = SignExtension(x,y.length);
 		if(y.length<x.length)
-			SignExtension(y,x.length);
+			y = SignExtension(y,x.length);
 		Bit[] output = new Bit[x.length];
 		for(int bit = 0; bit<output.length;bit++)
 		{
@@ -260,9 +260,9 @@ public final class Bit implements Serializable, Comparable<Bit>
 	public static Bit[] NXOR(Bit[] x, Bit[] y)
 	{
 		if(x.length<y.length)
-			SignExtension(x,y.length);
+			x = SignExtension(x,y.length);
 		if(y.length<x.length)
-			SignExtension(y,x.length);
+			y = SignExtension(y,x.length);
 		Bit[] output = new Bit[x.length];
 		for(int bit = 0; bit<output.length;bit++)
 		{
@@ -289,9 +289,9 @@ public final class Bit implements Serializable, Comparable<Bit>
 	public static Bit[] NOR(Bit[] x, Bit[] y)
 	{
 		if(x.length<y.length)
-			SignExtension(x,y.length);
+			x = SignExtension(x,y.length);
 		if(y.length<x.length)
-			SignExtension(y,x.length);
+			y = SignExtension(y,x.length);
 		Bit[] output = new Bit[x.length];
 		for(int bit = 0; bit<output.length;bit++)
 		{
@@ -317,19 +317,14 @@ public final class Bit implements Serializable, Comparable<Bit>
 		}
 		return temp;
 	}
-	public static Bit[] special(Bit[] x, Bit[] y) //Derives key1 where key1 AND key2 == key3, given key2 and key3
+	public static Bit[] special(Bit[] key2, Bit[] key3) //Derives key1 where key1 AND key2 == key3, given key2 and key3
 	{
-		if(x.length<y.length)
-			SignExtension(x,y.length);
-		if(y.length<x.length)
-			SignExtension(y,x.length);
-		Bit[] output = new Bit[x.length];
-		for(int bit = 0; bit<output.length;bit++)
-		{
-			if(x[bit].value && y[bit].value);
-			else
-				output[bit]=NOR(x[bit],y[bit]);
-		}
+		if(key2.length<key3.length)
+			key2 = SignExtension(key2,key3.length);
+		if(key3.length<key2.length)
+			key3 = SignExtension(key3,key2.length);
+		Bit[] output = new Bit[key2.length];
+		output = NXOR(XOR(key3,NOT(key2)),key2);
 		return output;
 	}
 	public static void rotateRightNoCarry(Bit[] b) //WARNING: Changes actual Bit array
@@ -466,7 +461,7 @@ public final class Bit implements Serializable, Comparable<Bit>
 	{
 		String output="";
 		if(b.length%8!=0)
-			SignExtension(b,b.length*16);
+			b = SignExtension(b,b.length*16);
 		for(int x=0;x<b.length;x=x+16)
 		{
 			Bit[] temp = new Bit[16];
@@ -536,6 +531,10 @@ public final class Bit implements Serializable, Comparable<Bit>
 		for(int x=0;x<b.length;x++)
 			bArray[x]=b[x].value;
 		return bArray;
+	}
+	public static byte[] toByteArray(Bit[] b)
+	{
+		return new java.math.BigInteger(toBinaryString(b),2).toByteArray();
 	}
 	public static String runlengthEncode(String pt) //implements runlength encoding
 	{
