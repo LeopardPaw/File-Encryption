@@ -1,2 +1,0 @@
-Make sure to commit files to repository on GitHub.
-Keep files synced or fork.

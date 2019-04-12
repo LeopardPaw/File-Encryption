@@ -1,79 +1,46 @@
 package com.tigerwolf.encryption;
 import java.util.Scanner;
-import static java.lang.System.in;
-import static java.lang.System.out;
-import java.util.InputMismatchException;
-import java.lang.Boolean;
-import java.util.Arrays;
-import java.lang.Integer;
-
-class Test
+import static java.lang.System.*;
+class testBits
 {
-	public static void main(String[] args)
+	public static void main(String[] args) throws java.io.IOException
 	{
-		Scanner scan = new Scanner(in);
+		Scanner s=new Scanner(in);
 		while(true)
 		{
 			out.print("Enter an integer:: ");
-			long input = Long.parseLong(scan.nextLine(),10);
-			Bit[] out1 = Bit.bitValue(input);
-			Bit[] out2 = Bit.bitValue(input);
-			out.println("Original:: "+Bit.inBinary(out1));
-			//Bit.rotateRightNoCarry(out2);
-			//out.println(Bit.inBinary(out2));
-			//out.print("Enter an integer:: ");
-			//input=Long.parseLong(scan.nextLine(),10);
-			//Bit[] out2 = Bit.bitValue(input);
-			//Bit[] out3 = Bit.AND(out1,out2);
-			//out.println(Bit.inBinary(out1)+"\nAND\n"+Bit.inBinary(out2)+"\n------------\n"+Bit.inBinary(out3));
-			//Bit[] out4 = Bit.special(out2,out3);
-			//Bit[] out5 = Bit.special(out1,out3);
-			//Bit[] out3 = out2;
-			Bit.rotateLeftNoCarry(out2);
-			out.println(Bit.inBinary(out2));
-		//	if(Arrays.equals(out1,out2))
-		//		out.println("Success");
-		//	else
-		//	{
-		//		out.println("Failure");
-		//		out.println(Bit.inBinary(out1)+"\n"+Bit.inBinary(out2));
-		//	}
-		//	out.println("Number:: "+input);
-		//	out.println("Unsigned binary:: "+Long.toBinaryString(input));
-		//	out.println("In binary:: "+Bit.inBinary(out1));
-		//	try
-		//	{
-		//		out.println("Back to base 10:: "+Bit.byteValue(out1));
-		//	}
-		//	catch(NumberFormatException e)
-		//	{
-		//		try
-		//		{
-		//			out.println("Back to base 10:: "+Bit.shortValue(out1));
-		//		}
-		//		catch(NumberFormatException f)
-		//		{
-		//			try
-		//			{
-		//				out.println("Back to base 10:: "+Bit.intValue(out1));
-		//			}
-		//			catch(NumberFormatException g)
-		//			{
-		//				try
-		//				{
-		//					out.println("Back to base 10:: "+Bit.longValue(out1));
-		//				}
-		//				catch(NumberFormatException h)
-		//				{
-		//					out.println("This should never happen."); //overflow?
-		//				}
-		//			}
-		//		}
-		//	}
-			out.print("Continue? (Y/N) ");
+			//String a=s.nextLine();
+			//String b=Bit.runlengthEncode(a);
+			Bit[] key1 = Bit.bitValue(s.nextLong());
+			out.print("Enter an integer:: ");
+			Bit[] key2 = Bit.bitValue(s.nextLong());
+			Bit[] key3 = Bit.AND(key1,key2);
+			//Bit[] b=Bit.bitValue(a);
+			//out.println("In binary:: "+Bit.inBinary(b));
+			//out.println("Compressed:: "+Bit.inBinary((Bit.compressString(Bit.stringValue(b)))));
+			//out.println("Your String:: "+Bit.stringValue(b));
+		//	out.println("Key3:: "+Bit.longValue(key3));
+		//	out.println("Key2:: "+Bit.longValue(key2));
+			out.println("key1:: "+Bit.longValue(key1));
+			int y = 0;
+			while(y++<32)
+			{
+				Bit.rotateLeftNoCarry(key1);
+				Bit.rotateLeftNoCarry(key2);
+				Bit.rotateLeftNoCarry(key3);
+			//	out.println("Key3:: "+Bit.inBinary(key3));
+			//	out.println("Key2:: "+Bit.inBinary(key2));
+				out.println("key1:: "+Bit.inBinary(key1));
+			}			
+		//	out.println("Key3:: "+Bit.longValue(key3));
+		//	out.println("Key2:: "+Bit.longValue(key2));
+			out.println("key1:: "+Bit.longValue(key1));
+			//out.println("Predicted key1:: "+Bit.longValue(Bit.special(key2,key3)));
+			s.nextLine();
+			out.print("Continue:: (Y/N) ");
 			try
 			{
-				char x = scan.nextLine().charAt(0);
+				char x = s.nextLine().charAt(0);
 				if(x!='Y'&&x!='y')
 					return;
 				out.println();
