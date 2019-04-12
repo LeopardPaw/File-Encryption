@@ -4,128 +4,106 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
-//@Author: Corbin Adamson
 //This class is used to redefine Boolean indirectly
 //Adds Bitwise operations to class
-public final class Bit implements Serializable, Comparable<Bit>
-{
-	public static final Class<Boolean> TYPE = Boolean.TYPE;
+public final class Bit implements Serializable, Comparable<Bit>{
 	public static final Bit TRUE = new Bit(true);
 	public static final Bit FALSE = new Bit(false);
 	private static final long serialVersionUID = -6334195800985631469L;
-	private final boolean value;
-	public Bit(boolean value)
-	{
+	private boolean value;
+
+	public Bit(boolean value){
 		this.value = value;
 	}
-	public Bit(String s)
-	{
-		this(toBoolean(s));
+
+	public Bit(String s){
+		toBoolean(s);
 	}
-	public Bit(Boolean b)
-	{
-		value=b.booleanValue();
+
+	public Bit(Boolean b){
+		value = b.booleanValue();
 	}
-	public static boolean parseBoolean(String s)
-	{
+
+	public static boolean parseBoolean(String s){
 		return toBoolean(s);
 	}
-	public boolean booleanValue()
-	{
+
+	public boolean booleanValue(){
 		return value;
 	}
-	public static Bit valueOf(boolean b)
-	{
+
+	public static Bit valueOf(boolean b){
 		return (b ? TRUE : FALSE);
 	}
-	public static Bit valueOf(String s)
-	{
+
+	public static Bit valueOf(String s){
 		return toBoolean(s) ? TRUE : FALSE;
 	}
-	public static String toString(boolean b)
-	{
+
+	public static String toString(boolean b){
 		return b ? "true" : "false";
 	}
-	public static String inBinary(Bit[] b)
-	{
+
+	public static String inBinary(Bit[] b){
 		return toBinaryString(b);
 	}
-	public String toString()
-	{
+
+	@Override
+	public String toString(){
 		return value ? "true" : "false";
 	}
-	public int hashCode()
-	{
+
+	public int hashCode(){
 		return value ? 1231 : 1237;
 	}
-	public boolean equals(Object obj)
-	{
-		if(obj instanceof Bit)
-		{
+
+	public boolean equals(Object obj){
+		if(obj instanceof Bit){
 			return value == ((Bit)obj).booleanValue();
 		}
-		if(obj instanceof Boolean)
-		{
-			return value == ((Bit)obj).booleanValue();
+		if(obj instanceof Boolean){
+			return value == ((Boolean)obj).booleanValue();
 		}
 		return false;
 	}
-	public static boolean getBoolean(String name)
-	{
-		boolean result = false;
-		try
-		{
-			result = toBoolean(System.getProperty(name));
-		}
-		catch(SecurityException e)
-		{
-		}
-		catch(NullPointerException e)
-		{
-		}
-		catch(IllegalArgumentException e)
-		{
-		}
-		return result;
-	}
-	public int compareTo(Bit b)
-	{
+
+	public int compareTo(Bit b){
 		return compare(this.value,b.value);
 	}
-	public int compareTo(Boolean b)
-	{
+
+	public int compareTo(Boolean b){
 		return compare(this.value,b.booleanValue());
 	}
-	public static int compare(boolean x,boolean y)
-	{
+
+	public static int compare(boolean x,boolean y){
 		return (x == y) ? 0 : (x ? 1 : -1);
 	}
-	public static int compare(Bit[] x, Bit[] y)
-	{
+
+	public static int compare(Bit[] x, Bit[] y){
 		return (Arrays.hashCode(x) == Arrays.hashCode(y)) ? 0 : ((Arrays.hashCode(x) > Arrays.hashCode(y)) ? 1 : -1);
 	}
-	private static boolean toBoolean(String name)
-	{
+
+	private static boolean toBoolean(String name){
 		return (name.equalsIgnoreCase("true")) ? true : false;
 	}
-	public static Bit AND(Bit x, Bit y)
-	{
+
+	public static Bit AND(Bit x, Bit y){
 		return AND(x.booleanValue(),y.booleanValue());
 	}
-	public static Bit AND(Bit x, boolean y)
-	{
+
+	public static Bit AND(Bit x, boolean y){
 		return AND(x.booleanValue(),y);
 	}
-	public static Bit AND(boolean x, Bit y)
-	{
+
+	public static Bit AND(boolean x, Bit y){
 		return AND(x,y.booleanValue());
 	}
-	public static Bit AND(boolean x, boolean y)
-	{
+
+	public static Bit AND(boolean x, boolean y){
 		return (x & y) ? TRUE : FALSE;
 	}
-	public static Bit[] AND(Bit[] x, Bit[] y)
-	{
+
+	public static Bit[] AND(Bit[] x, Bit[] y){
 		if(x.length<y.length)
 			x = SignExtension(x,y.length);
 		if(y.length<x.length)
@@ -137,24 +115,24 @@ public final class Bit implements Serializable, Comparable<Bit>
 		}
 		return output;
 	}
-	public static Bit XOR(Bit x, Bit y)
-	{
+
+	public static Bit XOR(Bit x, Bit y){
 		return XOR(x.booleanValue(),y.booleanValue());
 	}
-	public static Bit XOR(Bit x, boolean y)
-	{
+
+	public static Bit XOR(Bit x, boolean y){
 		return XOR(x.booleanValue(),y);
 	}
-	public static Bit XOR(boolean x, Bit y)
-	{
+
+	public static Bit XOR(boolean x, Bit y){
 		return XOR(x,y.booleanValue());
 	}
-	public static Bit XOR(boolean x, boolean y)
-	{
+
+	public static Bit XOR(boolean x, boolean y){
 		return (x ^ y) ? TRUE : FALSE;
 	}
-	public static Bit[] XOR (Bit[] x, Bit[] y)
-	{
+
+	public static Bit[] XOR (Bit[] x, Bit[] y){
 		if(x.length<y.length)
 			SignExtension(x,y.length);
 		if(y.length<x.length)
@@ -166,45 +144,44 @@ public final class Bit implements Serializable, Comparable<Bit>
 		}
 		return output;
 	}
-	public static Bit OR(Bit x, Bit y)
-	{
+
+	public static Bit OR(Bit x, Bit y){
 		return (x.booleanValue() | y.booleanValue()) ? TRUE : FALSE;
 	}
-	public static Bit OR(Bit x, boolean y)
-	{
+
+	public static Bit OR(Bit x, boolean y){
 		return (x.booleanValue() | y) ? TRUE : FALSE;
 	}
-	public static Bit OR(boolean x, Bit y)
-	{
+
+	public static Bit OR(boolean x, Bit y){
 		return (x | y.booleanValue()) ? TRUE : FALSE;
 	}
-	public static Bit OR(boolean x, boolean y)
-	{
+
+	public static Bit OR(boolean x, boolean y){
 		return (x | y) ? TRUE : FALSE;
 	}
-	public static Bit[] OR(Bit[] x, Bit[] y)
-	{
-		if(x.length<y.length)
+
+	public static Bit[] OR(Bit[] x, Bit[] y){
+		if(x.length < y.length)
 			SignExtension(x,y.length);
-		if(y.length<x.length)
+		if(y.length < x.length)
 			SignExtension(y,x.length);
 		Bit[] output = new Bit[x.length];
-		for(int bit = 0; bit<output.length;bit++)
-		{
+		for(int bit = 0; bit<output.length;bit++){
 			output[bit] = OR(x[bit],y[bit]);
 		}
 		return output;
 	}
-	public static Bit NOT(Bit x)
-	{
+
+	public static Bit NOT(Bit x){
 		return x.booleanValue() ? FALSE : TRUE;
 	}
-	public static Bit NOT(boolean x)
-	{
+
+	public static Bit NOT(boolean x){
 		return x ? FALSE : TRUE;
 	}
-	public static Bit[] NOT(Bit[] x)		//Complement(~) of bit array
-	{
+
+	public static Bit[] NOT(Bit[] x){		//Complement(~) of bit array
 		Bit[] output = new Bit[x.length];
 		for(int bit = 0; bit<output.length;bit++)
 		{
@@ -212,51 +189,51 @@ public final class Bit implements Serializable, Comparable<Bit>
 		}
 		return output;
 	}
-	public static Bit NAND(Bit x, Bit y)
-	{
+
+	public static Bit NAND(Bit x, Bit y){
 		return NAND(x.booleanValue(),y.booleanValue());
 	}
-	public static Bit NAND(Bit x, boolean y)
-	{
+
+	public static Bit NAND(Bit x, boolean y){
 		return NAND(x.booleanValue(),y);
 	}
-	public static Bit NAND(boolean x, Bit y)
-	{
+
+	public static Bit NAND(boolean x, Bit y){
 		return NAND(x,y.booleanValue());
 	}
-	public static Bit NAND(boolean x, boolean y)
-	{
+
+	public static Bit NAND(boolean x, boolean y){
 		return NOT(x&y);
 	}
-	public static Bit[] NAND(Bit[] x,Bit[] y)
-	{
+
+	public static Bit[] NAND(Bit[] x,Bit[] y){
 		if(x.length<y.length)
 			x = SignExtension(x,y.length);
 		if(y.length<x.length)
 			y = SignExtension(y,x.length);
 		Bit[] output = new Bit[x.length];
-		for(int bit = 0; bit<output.length;bit++)
-		{
+		for(int bit = 0; bit<output.length;bit++){
 			output[bit] = NAND(x[bit],y[bit]);
 		}
 		return output;
 	}
-	public static Bit NXOR(Bit x, Bit y)
-	{
+
+	public static Bit NXOR(Bit x, Bit y){
 		return NXOR(x.booleanValue(),y.booleanValue());
 	}
-	public static Bit NXOR(Bit x, boolean y)
-	{
+
+	public static Bit NXOR(Bit x, boolean y){
 		return NXOR(x.booleanValue(),y);
 	}
-	public static Bit NXOR(boolean x, Bit y)
-	{
+
+	public static Bit NXOR(boolean x, Bit y){
 		return NXOR(x,y.booleanValue());
 	}
-	public static Bit NXOR(boolean x, boolean y)
-	{
+
+	public static Bit NXOR(boolean x, boolean y){
 		return NOT(x ^ y);
 	}
+
 	public static Bit[] NXOR(Bit[] x, Bit[] y)
 	{
 		if(x.length<y.length)
@@ -304,17 +281,16 @@ public final class Bit implements Serializable, Comparable<Bit>
 		if(numBits<=bitArray.length)
 			return bitArray;
 		Bit signBit = bitArray[0];
-		Bit[] temp=new Bit[numBits];
-		//int increment=0;	//used to access positions in bitArray
-		for(int x=0;x<temp.length-bitArray.length;x++)
-		{
+		Bit[] temp = new Bit[numBits];
+		for(int x=0;x<temp.length-bitArray.length;x++){
 			temp[x]=signBit;
 		}
-		for(int x=temp.length-bitArray.length,increment=0;x<temp.length;x++)
+		System.arraycopy(bitArray, 0, temp, temp.length - bitArray.length, bitArray.length);
+		/*for(int x=temp.length-bitArray.length,increment=0;x<temp.length;x++)
 		{
 			temp[x]=bitArray[increment];
 			increment++;
-		}
+		}*/
 		return temp;
 	}
 	public static Bit[] special(Bit[] key2, Bit[] key3) //Derives key1 where key1 AND key2 == key3, given key2 and key3
@@ -577,36 +553,20 @@ public final class Bit implements Serializable, Comparable<Bit>
 		}
 		return ct;
 	}
-	public static Bit[] compress(Bit[] b)
-	{
+	public static Bit[] compress(Bit[] b){
 		return compress(b, b[0],b[1]);
 	}
-	public static Bit[] compressString(String s)
-	{
+	public static Bit[] compressString(String s){
 		char[] chars = s.toCharArray();
 		ArrayList <Bit> bits = new ArrayList<Bit>();
 		for(char c : chars)
 			bits.addAll(Arrays.asList(compress(bitValue(c))));
 		return bits.toArray(new Bit[]{});
 	}
-	private static Bit[] compress(Bit[] b, Bit pos,Bit pos2)
-	{
-		if(pos2.value)
-		{
+	private static Bit[] compress(Bit[] b, Bit pos,Bit pos2){
+		if(pos2.value){
 			return b;
 		}
 		return compress(Arrays.copyOfRange(b,1,b.length),b[1],b[2]);
-	}
-	public static byte[] compress(boolean[] b)
-	{
-		return new byte[1];
-	}
-	static byte[] compressHelper(Bit[] b)
-	{
-		return new byte[1];
-	}
-	static byte[] compressHelper(boolean[] b)
-	{
-		return new byte[1];
 	}
 }
